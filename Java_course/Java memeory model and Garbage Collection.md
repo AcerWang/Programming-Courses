@@ -1,0 +1,45 @@
+# Java Memory Model & Garbage Collection
+
+The Java memory model and garbage collection are very complicated and we cann't talk about very deeply here, for beginners, you need to have a basical knowledge of that, it's helpful for writing well-designed programs.
+
+### 1.1 Java Memeory Model
+
+When we launch a java program, we start the JVM in memory, the operating system allocates memory for the process. Memory allocated to the process includes the Heap, Meta Space, JIT code cache, thread stacks, and shared libraries etc. The memory model can be simplely expressed by this:
+
+![image desc](https://labex.io/upload/M/Y/E/w9Ar00ccTfvq.png)
+
+![image desc](https://labex.io/upload/E/G/W/iS6rUZg2AwAZ.png)
+
+- Heap Memory: JVM uses this memory to store objects. Objects on the heap can be accessed by all threads. An object may contain member varibles, these variables are stored on the heap along with the object.
+- Meta Space: This memory is out of heap memory and part of the native memory. As per the document by default the meta space doesn’t have an upper limit. 
+- Code cache: JVM has an interpreter to interpret the byte code and convert it to machine code. Some frequently accessed code blocks will be compiled to native code by the JIT and stored it in code cache.
+- Thread stack: For multi-thread programs, JVM will allocate memory for each thread called thread stack. The thread stack contains information about methods the thread calls and thread local variables of methods. Thread local variables can be primitive types or reference to object. An object methods  may contain local variables, these local variables are also stored on the thread stack.
+
+### 1.2 Garbage Collection
+
+Since memory allocated for JVM is limited, our programs may consume too much memory that the JVM cann't afford. Luckly, the JVM will automatically perform garbage collection for us. When does garbage collection happen? Typically, in several situations, it would occur:
+
+- Object cann't be reachable.
+
+  ```
+  Object obj = new Object();  
+  // it will triger GC
+  // original Object obj will be recycled by JVM
+  obj = null;   
+  ```
+
+- Reference is copied to another.
+
+  ```
+  Object obj1 = new Object();
+  Object obj2 = new Object();
+  // it will triger GC
+  // original Object obj2 will be recycled by JVM
+  obj2 = obj1;  
+  ```
+
+
+- JVM detects that there is not enough space.
+- User calls System.gc() or Runtime.getRunTime().gc() .
+
+Knowing the memory model and garbage collection can we  get to know how to avoid out of memory error and write program that save memory.

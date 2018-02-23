@@ -1,0 +1,76 @@
+# Package
+
+## 1. Experiment Introduction
+
+In this lab, you will learn to use packages to arrange for classes according to their functionalities .
+
+### Learning Objective
+
+- Packages
+
+## 2. Content
+
+### 2.1 Packages
+
+Till now, we have written many classes. For a big project, maybe there will be hundreds of classes, so many files and classes are not easy to organize, different programmers may write different classes, sometimes it would happen that classes with same name appear in a project. So how to avoid these problems, we can use packages. The Java libraries are divided into packages, including java.lang, which contains most of the classes we have used so far. A package is a grouping of related types providing access protection and name space management. Note that types refers to classes, interfaces, enumerations, and annotation types.
+
+To create a package, choose a name for the package and put a package statement with that name at the top of every source file that contains the types that you want to include in the package.The package statement must be the first line in the source file. Only one package statement can be in each source file.
+
+To use a public package member from outside its package, you must do one of the following:
+
+- Refer to the member by its fully qualified name
+- Import the package member
+- Import the member's entire package
+
+**Example**
+
+```
+// save in file: packageDemo.java
+package com.example.demo;  // create a new package
+
+public class packageDemo{
+	public static void test(){
+		System.out.println("This is a package test.");
+	}
+}
+
+// save in file:packageTest.java
+import com.example.demo.packageDemo;
+class packageTest{
+	public static void main(String[] args){
+		packageDemo.test();
+	}
+}
+```
+
+**Output:**
+
+```
+This is a package test.
+```
+
+In Eclipse, you should first choose File->New->Project->Java Project to establish a Java project called test, then right click the project test to create packages and classes.
+
+![image desc](https://labex.io/upload/I/X/U/KpU6MejdRcs6.png)
+
+![image desc](https://labex.io/upload/B/U/G/ex4u16fbL29Y.png)
+
+Right click the package com.example.demo to create a test class in the package.
+
+![image desc](https://labex.io/upload/D/G/D/YCBaKOgUpdwH.png)
+
+Write the code and save.
+
+![image desc](https://labex.io/upload/T/W/E/3kvgHd5LbXmj.png)
+
+Right click the document src to create a test class to use created package.
+
+![image desc](https://labex.io/upload/P/U/C/cNJTPGq0kG70.png)
+
+Write the code and save, click Run and watch the output, the document structure is like this.
+
+![image desc](https://labex.io/upload/V/J/T/wra5kYzUZHss.png)
+
+## 3. Summary
+
+Packages provide us a way to collect classes which have logical relation or achieve some special functions, using packages, we can get avoid name conflict. You can pack your code into packages providing to others or get packages from others, on the internet. It provides us more convenience of coding.

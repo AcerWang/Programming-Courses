@@ -1,0 +1,142 @@
+# Methods & Parameters and Object
+## 1. Experiment Introduction
+In this lab, we move forward to methods, objects. The task is to learn how to define a method with parameters, object is a very important concept in OOP language, so having a good knowledge of it  will be good for you. 
+### Learning Objective
+- Methods and Parameters
+- Object
+
+## 2. Content
+
+### 2.1 Methods & Parameters
+In some case, you need some code that can be reusing to solve some similar problems, such as print somebody's age and name, for different people, the name and age are different, this two varibles can be passed to a codeblock as parameters, then we introduce the function or method to do the task.
+
+**Example**
+
+    public class methodTest
+    {
+    	public static void main(String[] args)
+        {
+    	    printInfo("Mike", 18);
+    	    
+    	    System.out.println(fibonacci(10));
+    	    System.out.println(fibonacciNormal(10));
+    	}
+    	// we define a class method to print personal info
+        public static void printInfo(String name, int age){
+        	System.out.println("Hello " + name + ", your age is " + age);
+        }
+        // define a class method to compute fibonacci by recursion
+        public static int fibonacci(int n){  
+            if(n<=2){  
+                return 1;  
+            }else{  
+                return fibonacci(n-1)+fibonacci(n-2);  
+            }  
+        }  
+        // define a class method to compute fibonacci byrecurrence
+        public static int fibonacciNormal(int n){  
+            if(n<=2){  
+                return 1;  
+            }  
+            int n1=1,n2=1,sum=0;  
+            for(int i=0;i<n-2;i++){  
+                sum=n1+n2;  
+                n1=n2;  
+                n2=sum;  
+            }  
+            return sum;  
+        }
+    }
+**Output:**       
+    Hello Mike, your age is 18
+    55
+    55
+![image desc](https://labex.io/upload/O/R/F/1sUz2IWaB0fp.png)
+
+In the upper case, we write a function named printInfo (you can name it whatever you want), there are two parameters and the return type is void meaning nothing will be returned. You can determinate the return type of your function as any type you need, and the number/type of parameters can be any, you can define your method as follow:
+
+**Example**
+
+    public/private static/final/{not necessary} RETURN_TYPE METHOD_NAME( LIST OF PARAMETERS ) {
+        // STATEMENTS
+    }
+    public String getName(){}
+    public void setName(){}
+    public static void newInstance(){}
+    public final String msg(){}
+Java provides many functions that perform the most common operations as built-in lib methods, such as the mathematical methods. These functions are called methods. The math methods are invoked using a syntax that is similar to the print statements we have already seen:
+
+**Example**
+
+     double root = Math.sqrt(16.0);   // root = 4.0
+     double height = Math.sin(1.5);   // height = 0.9974949866040544
+### 2.2 Object
+
+There are two kinds of types in Java, primitive types and object types. Primitives, like int and boolean begin with lower-case letters; object types begin with upper-case letters. This distinction is useful because it reminds us of some of the differences between them:
+
+When you declare a primitive variable, you get storage space for a primitive value. When you declare an object variable, you get a space for a reference to an object. To get space for the object itself, you have to use new.
+
+If you don’t initialize a primitive type, it is given a default value that depends on the type. For example, 0 for ints and false for booleans. The default value for object types is null, which indicates no object.
+
+Primitive variables are well isolated in the sense that there is nothing you can do in one method that will affect a variable in another method. Object variables can be tricky to work with because they are not as well isolated. If you pass a reference to an object as an argument, the method you invoke might modify the object, in which case you will see the effect. Of course, that can be a good thing, but you have to be aware of it.
+
+If we pass primitive objects to a method (we call this passing parameter by value), we actually copy values of the primitive objects and use the copy inner the method, all the operations are based on the copy, outside the method, the primitive objects are not changed. But if we pass  non-primitive objects to a method (we call this passing parameter by reference), we pass the reference to the method, all the operations will actually affect the original objects.
+
+**Example**
+
+	public class objectTest {
+	  public static void main(String[] args){
+	      // use new to create an Array object with two items
+	      int[] numbers = new int[2];
+	      // assign values to the array object
+	      numbers[0] = 1;
+	      numbers[1] = 2;
+	      // for primitive object, create in this way
+	      int a = 1 , b = 2;
+	      
+		  // create a test object
+	      objectTest test = new objectTest();
+	      
+	      test.changeInt(a, b);
+	      System.out.println("Now a is " + a + ", b is " + b);
+	      
+	      test.changeArray(numbers);
+	      System.out.println("Now numbers contains:");
+	      
+	      for(int i : numbers){
+	          System.out.print(i + "\t");
+	      }
+	  }
+	  // define an object method, change int value
+	  public void changeInt(int a,int b){
+	      a = 2;
+	      b = 3;
+	      System.out.println("In changeInt method, a is " + a + ", b is " + b);
+	  }
+	  // define an  object method, change array value
+	  public void changeArray(int[] number){
+	      for(int i = 0;i < number.length;i++){
+	          number[i] = number[i]+1;    // change value of array item increasing by 1
+	      }
+	      System.out.println("In changeArray method, numbers contains:");
+	      for(int i : number){
+	          System.out.print(i + "\t");
+	      }
+	      System.out.println();
+	  }
+	}
+**Output:**
+
+    In changeInt method, a is 2, b is 3
+    Now a is 1, b is 2
+    In changeArray method, numbers contains:
+    2	3	
+    Now numbers contains:
+    2	3
+![image desc](https://labex.io/upload/F/Q/E/ucldDKR10lZn.png)
+
+There is one other difference between primitives and object types. You cannot add new primitives to Java (unless you get yourself on the standards committee), but you can create new object types! We’ll see how in the next chapter.
+
+## 3. Summary
+
+Methods are common in classes, a method is a code block that perform some special operations. Java provides many built-in classes which we can use directly.There are two types of passing parameterss to method:by value and by reference, their effect are different. In next lab, we  will introduce three to you, hope that would be helpful.
