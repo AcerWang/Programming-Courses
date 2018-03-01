@@ -1,0 +1,232 @@
+# File & io
+
+## 1. Introduction
+
+We did all the operations  in the memory before this lab. But you may need data persistence, such as write error log into a file, record some infomation in a local file, etc. Then you need to use file handling and the io operations.
+
+### Learning Objective
+
+- file reading
+- file writing
+- line filters
+
+## 2. Content
+
+### 2.1 Reading Files
+
+Reading and writing files are basic tasks needed for many Go programs. First we’ll look at some examples of reading files.
+
+```
+package main
+
+import (
+    "bufio"
+    "fmt"
+    "io"
+    "io/ioutil"
+    "os"
+)
+
+// Reading files requires checking most calls for errors.
+// This helper will streamline our error checks below.
+func check(e error) {
+    if e != nil {
+        panic(e)
+    }
+}
+
+func main() {
+
+	// Get a file’s entire contents into memory.
+	dat, err := ioutil.ReadFile("/tmp/dat")
+    check(err)
+    fmt.Print(string(dat))
+    
+    // Open a file to obtain an os.File value.
+    // This function gives you more control.
+    f, err := os.Open("/tmp/dat")
+    check(err)
+    
+    // Read some bytes from the beginning of the file.
+    // Allow up to 5 to be read but also note how many actually were read.
+    b1 := make([]byte, 5)
+    n1, err := f.Read(b1)
+    check(err)
+    fmt.Printf("%d bytes: %s\n", n1, string(b1))
+    
+    // You can also Seek to a known location in the file and Read from there.
+    o2, err := f.Seek(6, 0)
+    check(err)
+    b2 := make([]byte, 2)
+    n2, err := f.Read(b2)
+    check(err)
+    fmt.Printf("%d bytes @ %d: %s\n", n2, o2, string(b2))
+    
+    // The io package provides some functions that may be helpful for file reading.
+    // Read like the ones above can be more robustly implemented with ReadAtLeast.
+    o3, err := f.Seek(6, 0)
+    check(err)
+    b3 := make([]byte, 2)
+    n3, err := io.ReadAtLeast(f, b3, 2)
+    check(err)
+    fmt.Printf("%d bytes @ %d: %s\n", n3, o3, string(b3))
+    
+    // There is no built-in rewind, but Seek(0, 0) accomplishes this.
+    _, err = f.Seek(0, 0)
+    check(err)
+    
+    // The bufio package implements a buffered reader
+    // that may be useful both for its efficiency with many small reads
+    // and because of the additional reading methods it provides.
+    r4 := bufio.NewReader(f)
+    b4, err := r4.Peek(5)
+    check(err)
+    fmt.Printf("5 bytes: %s\n", string(b4))
+    // Close the file when you’re done.
+    f.Close()
+}
+```
+
+**Output:**
+
+```
+$ echo "hello" > /tmp/dat
+$ echo "go" >>   /tmp/dat
+$ go run reading-files.go 
+hello
+go
+5 bytes: hello
+2 bytes @ 6: go
+2 bytes @ 6: go
+5 bytes: hello
+```
+
+### 2.2 Writing Files
+
+Writing files in Go follows similar patterns to the ones we saw earlier for reading.
+
+```
+package main
+
+import (
+    "bufio"
+    "fmt"
+    "io/ioutil"
+    "os"
+)
+
+func check(e error) {
+    if e != nil {
+        panic(e)
+    }
+}
+
+func main() {
+
+	// To start, here’s how to dump a string (or just bytes) into a file.
+	d1 := []byte("hello\ngo\n")
+    err := ioutil.WriteFile("/tmp/dat1", d1, 0644)
+    check(err)
+    
+    // Create a file
+    f, err := os.Create("/tmp/dat2")
+    check(err)
+    
+    // It’s idiomatic to defer a Close immediately after opening a file.
+    defer f.Close()
+    
+    // You can Write byte slices as you’d expect.
+    d2 := []byte{115, 111, 109, 101, 10}
+    n2, err := f.Write(d2)
+    check(err)
+    fmt.Printf("wrote %d bytes\n", n2)
+    
+    // Write string to a file.
+    n3, err := f.WriteString("writes\n")
+    fmt.Printf("wrote %d bytes\n", n3)
+    
+    // Issue a Sync to flush writes to stable storage.
+    f.Sync()
+    
+    // bufio provides buffered writers in addition to the buffered readers.
+    w := bufio.NewWriter(f)
+    n4, err := w.WriteString("buffered\n")
+    fmt.Printf("wrote %d bytes\n", n4)
+    
+    // Use Flush to ensure all buffered operations
+    // have been applied to the underlying writer.
+    w.Flush()
+}
+```
+
+**Output:**
+
+```
+$ go run writing-files.go 
+wrote 5 bytes
+wrote 7 bytes
+wrote 9 bytes
+
+$ cat /tmp/dat1
+hello
+go
+$ cat /tmp/dat2
+some
+writes
+buffered
+```
+
+### 2.3 Line Filters
+
+A *line filter* is a common type of program that reads input on stdin, processes it, and then prints some derived result to stdout. `grep` and `sed` are common line filters. Here’s an example line filter in Go that writes a capitalized version of all input text. You can use this pattern to write your own Go line filters.
+
+```
+package main
+
+import (
+    "bufio"
+    "fmt"
+    "os"
+    "strings"
+)
+
+func main() {
+
+	// Wrapping the unbuffered os.Stdin with a buffered scanner
+    // gives us a convenient Scan method that 
+    // advances the scanner to the next token.
+	scanner := bufio.NewScanner(os.Stdin)
+	
+	// Text returns the current token,
+	// here the next line, from the input.
+	for scanner.Scan() {
+		// Write out the uppercased line.
+		ucl := strings.ToUpper(scanner.Text())
+		fmt.Println(ucl)
+    }
+    
+    // Check for errors during Scan.
+    // End of file is expected and not reported by Scan as an error.
+    if err := scanner.Err(); err != nil {
+        fmt.Fprintln(os.Stderr, "error:", err)
+        os.Exit(1)
+    }
+}
+```
+
+To try out our line filter, first make a file with a few lowercase lines. Then use the line filter to get uppercase lines.
+
+**Output:**
+
+```
+$ echo 'hello'   > /tmp/lines
+$ echo 'filter' >> /tmp/lines
+
+$ cat /tmp/lines | go run line-filters.go
+HELLO
+FILTER
+```
+
+## 3. Summary
+
+For large files, do not read all the content into the memory once. To read or write frequently using io operation use the bufio, it is more efficient. The standard library provids many functions for us. Read the source files to learn the details.
