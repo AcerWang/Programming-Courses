@@ -1,0 +1,267 @@
+# Array
+
+##1. Introduction
+
+Arrays are commonly used to store data of the same type. They are efficient, compact,easy to access. Combined with loop, the operations for elements in array are rather simple. Learn to use arrays.
+
+###Learning Objective
+
+- Array declaration and usage
+- Array and loop
+- Mult-dimensional array
+- Array of characters
+
+##2. Content
+
+To create an array, you need to known the length (or size) of the array in advance, and allocate accordingly. Once an array is created, its length is fixed and cannot be changed.
+
+![](2.png)
+
+### 2.1 Array Declaration and Usage
+
+Suppose that you want to find the average of the marks for a class of 30 students, you certainly do not want to create 30 variables: `mark1`, `mark2`, ..., `mark30`. Instead, You could use a single variable, called an *array*, with 30 elements.
+
+An array is *a list of elements of the same type*, identified by a pair of square brackets `[ ]`. To use an array, you need to *declare* the array with 3 things: a *name,* a *type* and a *dimension* (or *size*, or *length*). We recommend using a plural name for array, e.g., `marks`, `rows`, `numbers`. For example,
+
+```
+int marks[5];        // Declare an int array called marks with 5 elements
+double numbers[10];  // Declare an double array of 10 elements
+const int SIZE = 9;
+float temps[SIZE];   // Use const int as array length
+
+// Some compilers support an variable as array length, e.g.,
+int size;
+cout << "Enter the length of the array: ";
+cin >> size;
+float values[size];
+```
+
+Take note that, in C++, the value of the elements are undefined after declaration.
+
+You can also initialize the array during declaration with a comma-separated list of values, as follows:
+
+```
+// Declare and initialize an int array of 3 elements
+int numbers[3] = {11, 33, 44};
+// If length is omitted, the compiler counts the elements
+int numbers[] = {11, 33, 44};
+// Number of elements in the initialization shall be equal to or less than length
+int numbers[5] = {11, 33, 44};  // Remaining elements are zero. Confusing! Don't do this
+int numbers[2] = {11, 33, 44};  // ERROR: too many initializers
+
+// Use {0} or {} to initialize all elements to 0
+int numbers[5] = {0};  // First element to 0, the rest also to zero
+int numbers[5] = {};   // All element to 0 too
+```
+
+```
+/* Test local array initialization */
+#include <iostream>
+using namespace std;
+ 
+int main() {
+   int const SIZE = 5;
+ 
+   int a1[SIZE];   // Uninitialized
+   for (int i = 0; i < SIZE; ++i) cout << a1[i] << " ";
+   cout << endl;   // ? ? ? ? ?
+ 
+   int a2[SIZE] = {21, 22, 23, 24, 25}; // All elements initialized
+   for (int i = 0; i < SIZE; ++i) cout << a2[i] << " ";
+   cout << endl;   // 21 22 23 24 25
+ 
+   int a3[] = {31, 32, 33, 34, 35};   // Size deduced from init values
+   int a3Size = sizeof(a3)/sizeof(int);
+   cout << "Size is " << a3Size << endl;   // 5
+   for (int i = 0; i < a3Size; ++i) cout << a3[i] << " ";
+   cout << endl;   // 31 32 33 34 35
+ 
+   int a4[SIZE] = {41, 42};  // Leading elements initialized, the rests to 0
+   for (int i = 0; i < SIZE; ++i) cout << a4[i] << " ";
+   cout << endl;   // 41 42 0 0 0
+ 
+   int a5[SIZE] = {0};  // First elements to 0, the rests to 0 too
+   for (int i = 0; i < SIZE; ++i) cout << a5[i] << " ";
+   cout << endl;   // 0 0 0 0 0
+ 
+   int a6[SIZE] = {};   // All elements to 0 too
+   for (int i = 0; i < SIZE; ++i) cout << a6[i] << " ";
+   cout << endl;   // 0 0 0 0 0
+   
+   for (int i=0;i<5;i++){
+       // assign a value for each element of the array, like this
+       a6[i] = i;
+       cout << a6[i] << " ";
+   }
+}
+```
+
+Output:
+
+```
+6299128 0 485160213 32595 0 # some unexpected values
+21 22 23 24 25 
+Size is 5
+31 32 33 34 35 
+41 42 0 0 0 
+0 0 0 0 0 
+0 0 0 0 0 
+0 1 2 3 4
+```
+
+![](1.png)
+
+You can find the array length using expression `sizeof(arrayName)/sizeof(arrayName[0])`, where `sizeof(arrayName)` returns the total bytes of the array and `sizeof(arrayName[0])` returns the bytes of first element.
+
+###2.2 Array and Loop 
+
+Arrays works hand-in-hand with loops. You can process all the elements of an array via a loop. C++11 introduces a range-based for loop (or for-each loop) to iterate through an array,  for example,
+
+```
+/* Testing For-each loop */
+#include <iostream>
+using namespace std;
+ 
+int main() {
+   int numbers[] = {11, 22, 33, 44, 55};
+
+   // For each member called number of array numbers - read only 
+   for (int number : numbers) {
+      cout << number << " ";
+   }
+ 
+   // To modify members, need to use reference (&)
+   for (int &number : numbers) {
+      number = 99;
+   }
+ 
+   for (int number : numbers) {
+      cout << number << endl;
+   }
+   return 0;
+}
+```
+
+Output:
+
+```
+11 22 33 44 55 
+99 99 99 99 99
+```
+
+![](4.png)
+
+### 2.3 Mult-Dimensional Array
+
+For example,
+
+```
+int[2][3] = { {11, 22, 33}, {44, 55, 66} };
+```
+
+![](3.png)
+
+```
+/* Test Multi-dimensional Array */
+#include <iostream>
+using namespace std;
+void printArray(const int[][3], int);
+ 
+int main() {
+   int myArray[][3] = {{8, 2, 4}, {7, 5, 2}}; // 2x3 initialized
+                 // Only the first index can be omitted and implied
+   printArray(myArray, 2);
+   return 0;
+}
+ 
+// Print the contents of rows-by-3 array (columns is fixed)
+void printArray(const int array[][3], int rows) {
+   for (int i = 0; i < rows; ++i) {
+      for (int j = 0; j < 3; ++j) {
+         cout << array[i][j] << " ";
+      }
+      cout << endl;
+   }
+}
+```
+
+Output:
+
+```
+8 2 4
+7 5 2
+```
+
+![](5.png)
+
+### 2.4 Array of Characters
+
+In C, a string is a `char` array terminated by a NULL character `'\0'` (ASCII code of Hex `0`). C++ provides a new `string` class under header `<string>`. The original string in C is known as C-String (or C-style String or Character String). You could allocate a C-string via:
+
+```
+char message[256];     // Declare a char array 
+                       // Can hold a C-String of up to 255 characters terminated by '\0'
+char str1[] = "Hello"; // Declare and initialize with a "string literal".
+                       // The length of array is number of characters + 1 (for '\0').
+char str1char[] = {'H', 'e', 'l', 'l', 'o', '\0'};  // Same as above
+char str2[256] = "Hello";  // Length of array is 256, keeping a smaller string.
+```
+
+For novices, avoid C-string. Use C++ `string` (in header `<string>`) discussed earlier.
+
+You can use `cin` and `cout` to handle C-strings.
+
+- `cin <<` reads a string delimited by whitespace;
+- `cin.getline(*var*, *size*)` reads a string of into *var* till newline of length up to `size-1`, discarding the newline (replaced by `'\0'`). The `*size*` typically corresponds to the length of the C-string array.
+- `cin.get(*var*, *size*)` reads a string till newline, but leaves the newline in the input buffer.
+- `cin.get()`, without argument, reads the next character.
+
+```
+/* Test C-string */
+#include <iostream>
+using namespace std;
+ 
+int main() {
+   char msg[256]; // Hold a string of up to 255 characters (terminated by '\0')
+ 
+   cout << "Enter a message (with space)" << endl;
+   cin.getline(msg, 256);  // Read up to 255 characters into msg
+   cout << msg << endl;
+ 
+   // Access via null-terminated character array
+   for (int i = 0; msg[i] != '\0'; ++i) {
+      cout << msg[i];
+   }
+   cout << endl;
+ 
+   cout << "Enter a word (without space)" << endl;
+   cin >> msg;
+   cout << msg << endl;
+ 
+   // Access via null-terminated character array
+   for (int i = 0; msg[i] != '\0'; ++i) {
+      cout << msg[i];
+   }
+   cout << endl;
+   return 0;
+}
+```
+
+Outout:
+
+```
+Enter a message (with space)
+hello, how are you?
+hello, how are you?
+hello, how are you?
+Enter a word (without space)
+helloworld
+helloworld
+helloworld
+```
+
+![](6.png)
+
+##3. Summary
+
+C/C++ does not perform array *index-bound check*. In other words, if the index is beyond the array's bounds, it does not issue a warning/error. Nonetheless, you need to estimate the length and allocate an upper bound. This is probably the major drawback of using an array. C++ has a `vector` template class (and C++11 added an `array` template class), which supports dynamic resizable array.
