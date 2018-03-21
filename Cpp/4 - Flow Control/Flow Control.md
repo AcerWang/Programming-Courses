@@ -1,0 +1,392 @@
+# Flow Control
+
+##1. Introduction
+
+There are three basic flow control constructs - *sequential*, *conditional* (or *decision*), and *loop* (or *iteration*). The sequential structure: the execution process is from the top to the bottom line by line. The conditional structure is using if-else statement to verify whether  a statement satisfys some specific condition and then make choose. The loop structure is used to execute some logic operation repeatedly.
+
+###Learning Objective
+
+- Sequential flow control
+- Conditional flow control
+- Loop flow control
+- Interrupt loop flow - break and continue
+- Terminate program
+- Nested loops
+
+##2. Content
+
+![](1.png)
+
+### 2.1 Sequential Flow Control
+
+A program is a sequence of instructions. *Sequential* flow is the most common and straight-forward, where programming statements are executed in the order that they are written - from top to bottom in a sequential manner.
+
+### 2.2 Conditional Flow Control
+
+There are a few types of conditionals, *if-then*, *if-then-else*, *nested-if* (*if-elseif-elseif-...-else*), *switch-case*, and *conditional expression*.
+
+```
+#include <iostream>
+using namespace std;
+
+int main(){
+
+	int mark;
+	
+	cout<<"Input a number [0-100]: ";
+	cin>>mark;
+    // if
+    if (mark >= 50) {
+       cout << "Congratulation!" << endl;
+       cout << "Keep it up!" << endl;
+    }
+    
+    cout<<"Input a number [0-100]: ";
+	cin>>mark;
+    // if-else
+    if (mark >= 50) {
+       cout << "Congratulation!" << endl;
+       cout << "Keep it up!" << endl;
+    } else {
+       cout << "Try Harder!" << endl;
+    }
+
+	cout<<"Input a number [0-100]: ";
+	cin>>mark;
+    // nested-if
+    if (mark >= 80) {
+       cout << "A" << endl;
+    } else if (mark >= 70) {
+       cout << "B" << endl;
+    } else if (mark >= 60) {
+       cout << "C" << endl;
+    } else if (mark >= 50) {
+       cout << "D" << endl;
+    } else {
+       cout << "F" << endl;
+    }
+	
+    // switch-case
+    char oper; 
+    int num1 = 1, num2 = 2, result = 0;
+    cout<<"Input a char [+ - / *]: ";
+    cin>> oper;
+    switch (oper) {
+       case '+': 
+          result = num1 + num2; 
+          break;
+       case '-': 
+          result = num1 - num2; 
+          break;
+       case '*': 
+          result = num1 * num2; 
+          break;
+       case '/': 
+          result = num1 / num2; 
+          break;
+       default:
+          cout << "Unknown operator" << endl;
+    }
+    cout<<num1<<oper<<num2<<"="<<result;
+    return 0;
+}
+```
+
+Output:
+
+```
+Input a number [0-100]: 50
+Congratulation!
+Keep it up!
+Input a number [0-100]: 40
+Try Harder!
+Input a number [0-100]: 85
+A
+Input a char [+ - / *]: +
+1+2=3
+```
+
+![](3.png)
+
+Conditional Operator: A conditional operator is a ternary (3-operand) operator, in the form of `booleanExpr ? trueExpr : falseExpr`. Depending on the `booleanExpr`, it evaluates and returns the value of *trueExpr* or `falseExpr`.
+
+```
+// return either "PASS" or "FAIL", and put to cout
+cout << (mark >= 50) ? "PASS" : "FAIL" << endl;
+
+max = (a > b) ? a : b;   // RHS returns a or b
+abs = (a > 0) ? a : -a;  // RHS returns a or -a   
+```
+
+Braces: You could omit the braces `{ }`, if there is only one statement inside the block. For example,
+
+```
+if (mark >= 50) 
+   cout << "PASS" << endl;   // Only one statement, can omit { } but not recommended
+else {                       // more than one statements, need { }
+   cout << "FAIL" << endl;
+   cout << "Try Harder!" << endl;
+}
+```
+
+However, we recommend that you keep the braces, even though there is only one statement in the block, to improve the readability of your program.
+
+###2.3 Loop Flow Control
+
+Again, there are a few types of loops: *for-loop*, *while-do*, and *do-while*.
+
+```
+// for-loop
+int sum = 0;
+for (int number = 1; number <= 100; ++number) {
+   sum += number;
+}
+
+// while-do
+int sum = 0, number = 1;
+while (number <= 100) {
+   sum += number;
+   ++number;
+}
+
+// do-while
+int sum = 0, number = 1;
+do {
+   sum += number;
+   ++number;
+} while (number <= 100);
+```
+
+Prompt user for an upperbound. Sum the integers from 1 to a given upperbound and compute its average.
+
+```
+/*
+ * Sum from 1 to a given upperbound and compute their average.
+ */
+#include <iostream>
+using namespace std;
+ 
+int main() {
+   int sum = 0;     // Store the accumulated sum
+   int upperbound;
+   cout << "Enter the upperbound: ";
+   cin >> upperbound;
+ 
+   // Sum from 1 to the upperbound
+   for (int number = 1; number <= upperbound; ++number) {
+      sum += number;
+   }
+   cout << "Sum is " << sum << endl;
+   cout << "Average is " << (double)sum / upperbound << endl;
+ 
+   // Sum only the odd numbers
+   int count = 0;     // counts of odd numbers
+   sum = 0;           // reset sum
+   for (int number=1; number <= upperbound; number=number+2) {
+      ++count;
+      sum += number;
+   }
+   cout << "Sum of odd numbers is " << sum << endl;
+   cout << "Average is " << (double)sum / count << endl;
+}
+```
+
+Output:
+
+```
+Enter the upperbound: 15
+Sum is 120
+Average is 8
+Sum of odd numbers is 64
+Average is 8
+```
+
+![](4.png)
+
+### 2.4 Interrupting Loop Flow - "break" and "continue"
+
+The `break` statement breaks out and exits the current (innermost) loop.
+
+The `continue` statement aborts the current iteration and continue to the next iteration of the current (innermost) loop.
+
+`break` and `continue` are poor structures as they are hard to read and hard to follow. Use them only if absolutely necessary. You can always write the same program without using `break` and `continue`.
+
+The following program lists the non-prime numbers between 2 and an upperbound.
+
+```
+/*
+ *  List non-prime from 1 to an upperbound.
+ */
+#include <iostream>
+#include <cmath>
+using namespace std;
+ 
+int main() {
+   int upperbound;
+   cout << "Enter the upperbound: ";
+   cin >> upperbound;
+   for (int number = 2; number <= upperbound; ++number) {
+      // Not a prime, if there is a factor between 2 and sqrt(number)
+      int maxFactor = (int)sqrt(number);
+      for (int factor = 2; factor <= maxFactor; ++factor) {
+         if (number % factor == 0) {   // Factor?
+            cout << number << " ";
+            break;   // A factor found, no need to search for more factors
+         }
+      }
+   }
+   cout << endl;
+   return 0;
+}
+```
+
+Output:
+
+```
+Enter the upperbound: 20
+4 6 8 9 10 12 14 15 16 18 20 
+```
+
+![](5.png)
+
+Let's rewrite the above program to list all the primes instead. A `boolean` flag called `isPrime` is used to indicate whether the current `number`is a prime. It is then used to control the printing.
+
+```
+/*
+ *  List primes from 1 to an upperbound.
+ */
+#include <iostream>
+#include <cmath>
+using namespace std;
+ 
+int main() {
+   int upperbound;
+   cout << "Enter the upperbound: ";
+   cin >> upperbound;
+   for (int number = 2; number <= upperbound; ++number) {
+      // Not a prime, if there is a factor between 2 and sqrt(number)
+      int maxFactor = (int)sqrt(number);
+      bool isPrime = true;  // boolean flag to indicate whether number is a prime
+      for (int factor = 2; factor <= maxFactor; ++factor) {
+         if (number % factor == 0) {   // Factor?
+            isPrime = false;   // number is not a prime
+            break;   // A factor found, no need to search for more factors
+         }
+      }
+      if (isPrime) cout << number << " ";
+   }
+   cout << endl;
+   return 0;
+}
+```
+
+Output:
+
+```
+Enter the upperbound: 100
+2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 
+```
+
+![](6.png)
+
+Study the following program using break and continue.
+
+```
+/* A mystery series */
+#include <iostream>
+using namespace std;
+ 
+int main() {
+   int number = 1;
+   while (true) {
+      ++number;
+      if ((number % 3) == 0) continue;
+      if (number == 53) break;
+      if ((number % 2) == 0) {
+         number += 3;
+      } else {
+         number -= 3;
+      }
+      cout << number << " ";
+   }
+   cout << endl;
+   return 0;
+}
+```
+
+Output:
+
+```
+5 4 2 7 11 10 8 13 17 16 14 19 23 22 20 25 29 28 26 31 35 34 32 37 41 40 38 43 47 46 44 49 53 52 
+```
+
+![](7.png)
+
+### 2.5 Terminating Program
+
+There are a few ways that you can terminate your program, before reaching the end of the programming statements.
+
+exit(): You could invoke the function `exit(int exitCode)`, in `<cstdlib>` (ported from C's "`stdlib.h`"), to terminate the program and return the control to the Operating System. By convention, return code of zero indicates normal termination; while a non-zero `exitCode` (-1) indicates *abnormal termination*. For example,
+
+abort(): The header `<cstdlib>` also provide a function called `abort()`, which can be used to terminate the program *abnormally*.
+
+```
+if (errorCount > 10) {
+   cout << "too many errors" << endl;
+   exit(-1);  // Terminate the program
+              // OR abort();
+}
+```
+
+### 2.6 Nested Loops
+
+The following diagram illustrates a nested for-loop, i.e., an inner for-loop within an outer for-loop.
+
+![](2.png)
+
+```
+/*
+ *  Print triangle pattern.
+ */
+#include <iostream>
+using namespace std;
+ 
+int main() {
+   int size = 8;
+   for (int row = 1; row <= size; ++row) {     // Outer loop to print all the rows
+      for (int col = 1; col <= size-row+1; ++col) {  // Inner loop to print all the columns of each row
+         cout << "# ";
+      }
+      cout << endl;   // A row ended, bring the cursor to the next line
+   }
+ 
+   return 0;
+}
+```
+
+Output:
+
+```
+# # # # # # # # 
+# # # # # # # 
+# # # # # # 
+# # # # # 
+# # # # 
+# # # 
+# # 
+# 
+```
+
+![](8.png)
+
+The following constructs is commonly used:
+
+```
+while (true) { ...... }
+```
+
+It seems to be an endless loop (or infinite loop), but it is usually terminated via a `break` or `return` statement inside the loop body. This kind of code is hard to read - avoid if possible by re-writing the condition.
+
+##3. Summary
+
+We introduced three control structures in this section. There are very useful. You can combine them together. Be careful for the loop, check the terminal condition, in case of endless loop.
