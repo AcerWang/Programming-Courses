@@ -1,6 +1,7 @@
 # Programming courses
 - Java
 - Python
+- Git
 - MySQL
 - Go
 - C++
