@@ -1,42 +1,28 @@
 # Use Python to Build a Chat Room
 
-## 1. Overview
+## 1. Introduction
 
-### 1.1 Introduction
+In this tutorial, we use modules such as `wxPython`, `asynchat`, `_thread` to develop a graphical interface chat room program. We can log in to the chat room via a graphical client and chat with other members.
 
-This tutorial uses modules such as wxPython, asynchat, _thread to develop a graphical interface chat room program.
-
-### 1.2 Learning Objevtives
+### Learning Objevtives
 
 + asyncore, asynchat modules
 + wxPython graphics development
 
-### 1.3 Operating Environment
+### Environment Requirement
 
 + python 3.5
 + wxPython
 
-### 1.4 Download Code
+### Project Display
 
-Here is the link for you to download the full code used：
-```
-# download
-git clone https://github.com/LabExCoding/PyChat.git
-```
+![image desc](http://labex.io/upload/I/G/W/B6xEoCsH7Oya.png)
 
-You can download into your file and use to learn.
+##2. Implementation Steps
 
-![](13.png)
+###2.1 Demand Analysis
 
-## 2. Principles
-
-### 2.1 Description
-
-In this tutorial, we will implement a simple graphical interface chat system. We can log in to the chat room via a graphical client and chat with other members.
-
-### 2.2 Analysis
-
-Since Python is a language with GIL, it is not a good choice to use multithreaded IO operations in Python. At the same time, the chat server will communicate with multiple sockets, so we can implement the chat server based on the asyncore module. The aysncore module is an asynchronous socket processor. Using this module will greatly simplify the asynchronous programming. The asynchat module is further encapsulated on the basis of the asyncore module, which simplifies the development of communication tasks based on text protocols.
+Since Python is a language with GIL, it is not a good choice to use multithreaded IO operations in Python. At the same time, the chat server will communicate with multiple sockets, so we can implement the chat server based on the asyncore module. The `aysncore` module is an asynchronous socket processor. Using this module will greatly simplify the asynchronous programming. The `asynchat` module is further encapsulated on the basis of the `asyncore` module, which simplifies the development of communication tasks based on text protocols.
 
 Since you want to develop a chat program, it is necessary to design the protocol that is used when chatting. For the sake of simplicity, the chat server we are going to develop only supports the text protocol and invokes the related operations through the command message. For example, if the client sends the following text, it will perform the corresponding operation:
 
@@ -53,29 +39,28 @@ logout\n
 
 In the above protocol flow, `login`, `say`, `look`, `logout` is the relevant protocol code.
 
-## 3. Preparation
+###2.2 Preparation
 
-This tutorial is based on the python3 environment whose installation package is already provided. You can go to [here](https://extras.wxpython.org/wxPython4/extras/linux/gtk2/ubuntu-14.04/) to download wxPython module. Do the operations step by step as we'll show you.
+This tutorial is based on the python3 environment whose installation package is already provided. Do the operations step by step as we'll show you.
 
-Open the browser, and  access the website.
+Open the terminal, and type the command.
 
-![](10.png)
-
-Choose this file to download.
-
-![](11.png)
+```shell
+wget https://labexfile.oss-us-west-1-internal.aliyuncs.com/courses/52/wxPython-4.0.0-cp35-cp35m-linux_x86_64.whl
+sudo  pip3 install wxPython-4.0.0-cp35-cp35m-linux_x86_64.whl
+```
 
 After finishing download, the file is in this folder. You open the folder and open a terminal here and use the command `sudo  pip3 install wxPython-4.0.0-cp35-cp35m-linux_x86_64.whl` to  install it.
 
-![](12.png)
+![image desc](https://labex.io/upload/I/G/A/oISmUhVfDPpe.png)
 
-## 4. Procedure
+###2.3 Development - Server
 
-### 4.1 Serview type
+####2.3.1 Server
 
-Here we first need a chat server class, which is implemented by inheriting the asyncore dispatcher class. We write the `server.py` file:
+Here we first need a chat server class, which is implemented by inheriting the `asyncore` dispatcher class. We write the `server.py` file:
 
-```
+```python
 import asynchat
 import asyncore
 
@@ -112,11 +97,11 @@ class ChatServer(asyncore.dispatcher):
 
 Note here that for `asyncore` and `asynchat` module, you will need to use `asyncio` module as replacement in python3.6
 
-### 4.2 Chat class
+####2.3.2 ChatSession
 
 Now we have a server class, and we also need to be able to maintain each user's connection session, which is inherited from asynchat's `async_chat` class. It is defined in the `server.py` file, and the code is as follows:
 
-```
+```python
 class ChatSession(asynchat.async_chat):
     """
     Responsible for communication with clients
@@ -161,11 +146,11 @@ class ChatSession(asynchat.async_chat):
         self.enter(LogoutRoom(self.server))
 ```
 
-### 4.3 Protocol command interpreter
+####2.3.3 CommandHandler
 
 In the previous analysis, we designed the protocol of the chat server, we need to implement the corresponding method of the protocol command, specifically to deal with the user login, exit, send a message, query the code of the online user. Defined in the `server.py` file,
 
-```
+```python
 class CommandHandler:
     """
     command processing class
@@ -195,11 +180,11 @@ class CommandHandler:
             self.unknown(session, cmd)
 ```
 
-### 4.4 Room
+####2.3.4 Room
 
-Now let's talk about rooms in the chat room. Here we have defined 3 types of rooms: the room where the user has just logged in; the room that is chatting, and the room that logged out. All three rooms are inherited from the CommandHandler, defined in the `server.py` file, and the code is as follows:
+Now let's talk about rooms in the chat room. Here we have defined 3 types of rooms: the room where the user has just logged in, the room that is chatting, and the room that logged out. All three rooms are inherited from the `CommandHandler`, defined in the `server.py` file, and the code is as follows:
 
-```
+```python
 class Room(CommandHandler):
     """
     Environment with multiple users, responsible for basic command processing and broadcasting
@@ -304,14 +289,16 @@ if __name__ == '__main__':
         print("chat server exit")
 ```
 
-### 4.5 Log in window
+### 2.4 Development - Client
 
 
-After the server is completed, you need to implement the client. The client will be based on the wxPython module implementation. The wxPython module is a Python binding for the wxWidgets GUI tool. So we can implement GUI programming through the wxPython module. At the same time our chat protocol is based on text, so the communication between us and the server will be based on the telnetlib module.
+After the server is completed, you need to implement the client. The client will be based on the `wxPython` module implementation. The `wxPython` module is a Python binding for the `wxWidgets` GUI tool. So we can implement GUI programming through the `wxPython` module. At the same time our chat protocol is based on text, so the communication between us and the server will be based on the telnetlib module.
 
-The login window is implemented by inheriting the wx.Frame class and writing the `client.py` file, the code is as follows：
+####2.4.1 LoginFrame
 
-```
+The login window is implemented by inheriting the `wx.Frame` class and writing the `client.py` file, the code is as follows：
+
+```python
 import wx
 import telnetlib
 from time import sleep
@@ -364,11 +351,11 @@ class LoginFrame(wx.Frame):
         dialog.ShowModal()
 ```
 
-### 4.6 Chat window
+####2.4.2 ChatFrame
 
 The main thing in the chat window is to send a message to the server and accept the message from the server. Here the child thread receives the message and defines it in the `client.py` file. The code is as follows:
 
-```
+```python
 class ChatFrame(wx.Frame):
     """
     chat window
@@ -423,10 +410,9 @@ if __name__ == '__main__':
     con = telnetlib.Telnet()
     LoginFrame(None, -1, title="Login", size=(320, 250))
     app.MainLoop()
-
 ```
 
-### 4.7 Example
+###2.5 Test ChatRoom
 
 + First, execute `server.py` ：
 
@@ -450,10 +436,10 @@ if __name__ == '__main__':
 ![image desc](http://labex.io/upload/C/P/T/xCQ5lzfAFk3t.png)
 
 
-## 5. Project Extension
+## 3. Project Extension
 
-The graphical interface used here is wxPython. You can try changing the GUI package to implement the client.
+The graphical interface used here is `wxPython`. You can try to use other GUI package (such as `PyQt`, `Tkinter`) to implement the client. If you use Python3.6+, think about how to use `asyncio` to implement this project.
 
-## 6. Summary
+## 4. Summary
 
-Finally, you can run the program to chat. Pay attention to the need to start the server and then start the client. This project uses asyncore's dispatcher to implement the server, asynchat's asyn_chat to maintain the user's connection session, wxPython to implement the graphical interface, and telnetlib to connect to the server to receive messages from the server in the child thread. The chat room program is complete.
+Finally, you can run the program to chat. Pay attention to the need to start the server and then start the client. This project uses asyncore's dispatcher to implement the server, `asynchat`'s asyn_chat to maintain the user's connection session, `wxPython` to implement the graphical interface, and `telnetlib` to connect to the server to receive messages from the server in the child thread. The chat room program is complete.
