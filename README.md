@@ -1,6 +1,7 @@
 # Programming courses
 - Java
 - Python
+- MySQL
 - Go
 - C++
 - Data Analysis
