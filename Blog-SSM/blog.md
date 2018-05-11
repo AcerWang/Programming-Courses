@@ -21,48 +21,53 @@ In this experiment, we'll show you how to use Spring MVC + Spring + Mybatis (SSM
 - Tomcat server
 - Xfce terminal
 
-##2. Project Structure
+### Project Display
 
-![](proj_structure.jpg)
+**Project display**
 
-##3. Implementation
+![](https://labex.io/upload/I/Y/Q/pWCNg3m9wXtF.png)
 
-### 3.1 Create a project
+**Project structure**
+
+![](https://labex.io/upload/T/M/S/wY6xv2n1jAyK.jpg)
+
+##2. Implementation
+
+### 2.1 Create a project
 
 Firstly, open eclipse in the environment to create a project. Click New-->Dynamic Web Project, and input the project name -- PersonalBlog, click next, choose auto generate web.xml, then click finish, now the project is created.
 
-![](generate_xml.png)
+![](https://labex.io/upload/O/T/G/sfg04FUm7Zbg.png)
 
-### 3.2 Import Jar packages and other resource
+### 2.2 Import Jar packages and other resource
 
 Download SSM framework dependencies packages to the local environment. In this project, we use markdown editor to edit blogs. Download an open source markdown editor -- Editor.md. Download two pictures, one for logo and the other for home page. We prepare all files for you. Use this cmd to get the resource.
 
-```
-git clone https://github.com/LabExCoding/Blog_SSM
-```
-
-Then unzip img,zip and EditorMd.zip
-
-```
-unzip img.zip
-unzip EditorMd.zip
+```shell
+wget https://labexfile.oss-us-west-1-internal.aliyuncs.com/courses/60/Blog_SSM.zip
 ```
 
-![](unzip_file.png)
+Then unzipBlog_SSM.zip
+
+```shell
+unzip Blog_SSM.zip -d Blog_SSM
+```
+
+![](https://labex.io/upload/B/D/X/fJM75gmidM5c.png)
 
 Copy these two folder to PersonalBlog/WebContent folder.
 
-![](copy_folder.png)
+![](https://labex.io/upload/X/Y/B/IZ4uNczdazZ2.png)
 
 Copy all the Jar files to PersonalBlog/WebContent/WEB-INF/lib folder.
 
-![](copy_jar_files.png)
+![](https://labex.io/upload/W/W/J/T566MYE30Ii6.png)
 
 Add these jar files to build path. Right click project name-->Build Path-->Configure Build Path. First, in Libraries Tab -->Add JARs and choose all the copied jar files. In the Order and Export Tab, select all.
 
-![](add_lib.png)
+![](https://labex.io/upload/O/I/K/PIYUhb6QxmCH.png)
 
-###3.3 Create database and tables
+###2.3 Create database and tables
 
 Open the terminal, and type the command:
 
@@ -115,7 +120,7 @@ CREATE TABLE `diary` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 ```
 
-### 3.4 Create entity models
+### 2.4 Create entity models
 
 Each entity class corresponds to a table in database. All entity classes are part of package com.personal.model, the entity classes are as follows:
 
@@ -189,9 +194,9 @@ public class Diary {
 
 Now, the preparation has been done, you can start to work with other part of the project.
 
-### 3.5 Front-end development
+### 2.5 Front-end development
 
-####3.5.1 CSS style and JS script
+####2.5.1 CSS style and JS script
 
 In our project, the front-end pages are jsp files including some css style and js code. All css files locate in /WebContent/CSS folder, there are three css files, they are index.css, about.css, saylist.css .
 
@@ -314,9 +319,9 @@ function fun1(){
 
 The jquery lib, you can copy it from the downloaded git repository to WebContent/js folder.
 
-![](import-jquery.png)
+![image desc](https://labex.io/upload/W/W/E/CeyEF6agX1lV.png)
 
-####3.5.2 JSP files
+####2.5.2 JSP files
 
 1. blogindex.jsp page is a welcome page, when accessing this page, it autoload js script, and get  blogs data from database and then redirect to index.jsp, it serves as a mediation. Using this page, we can avoid recursively jumping to home page.
 
@@ -874,9 +879,9 @@ window.location ="writediary.jsp"
 
 So far, we have already finished all the front-end pages and CSS, JS files. Next, we'll begin to write business logic layer.
 
-### 3.6 Back-end development
+### 2.6 Back-end development
 
-####3.6.1 Business logic layer for blog
+####2.6.1 Business logic layer for blog
 
 The functions we'll implement include storing blog content, search for all blogs and search a blog by id, delete a blog.
 
@@ -1125,7 +1130,7 @@ The configuration file is BlogMapper.xml :
 </mapper>
 ```
 
-####3.6.2 Business logic layer for diary
+####2.6.2 Business logic layer for diary
 
 This part is very similar to the previous. Firstly, let's write DiaryController.
 
@@ -1331,7 +1336,7 @@ The configuration file is DiaryMapper.xml .
 
 All the processing progress is finished, next we need to modify the configuration file.
 
-### 3.7 Config the project
+### 2.7 Project Configuration
 
 In web.xml, we need to config some options of SSM framework, including listerner, loader, etc.
 
@@ -1495,7 +1500,7 @@ spring-mvc.xml  configs controller and viewResolver.
 </beans>
 ```
 
-## 4. Test the project
+## 3. Test the project
 
 Before test, we need some preparation:
 
@@ -1506,49 +1511,49 @@ Before test, we need some preparation:
 
 You should have patient with the server starting, it will take some time.
 
-![](expand-server-timeout.png)
+![](https://labex.io/upload/C/S/M/VrzXvSn2XQP0.png)
 
 Open the browser, and type in the address : [localhost:8080/PersonalBlog/](localhost:8080/PersonalBlog/) , it will work.
 
 This is the home page.
 
-![](test-homepage.png)
+![](https://labex.io/upload/I/Y/Q/pWCNg3m9wXtF.png)
 
 The read blog page.
 
-![](test-readblog.png)
+![](https://labex.io/upload/F/D/M/ApC7UnG9nblx.png)
 
 The about me page.
 
-![](test-aboutme.png)
+![](https://labex.io/upload/K/P/B/lWoRFm7zK0Mj.png)
 
 The diary page.
 
-![](test-diary.png)
+![](https://labex.io/upload/D/E/F/UR4JcE5HXmd5.png)
 
 The admin page.
 
-![](test-admin.png)
+![](https://labex.io/upload/C/Q/M/i7Jyusc6L7mi.png)
 
 The admin blog page.
 
-![](test-adminblog.png)
+![](https://labex.io/upload/R/B/N/0dJxDusX3tt5.png)
 
 The admin diary page.
 
-![](test-admindiary.png)
+![](https://labex.io/upload/P/M/N/UcLVotN1aBy2.png)
 
 The write blog page.
 
-![](test-writeblog.png)
+![](https://labex.io/upload/P/Y/G/GCVaULfUsQwJ.png)
 
 The write diary page.
 
-![](test-writediary.png)
+![](https://labex.io/upload/V/V/M/RPePtvAXa0Cv.png)
 
 
 
 
-##5. Summary
+##4. Summary
 
 In this project, you used some basic front-end skills to build some simple pages. The core of this project is to show you how to use SSM framework to create a dynamic web. You should be accustomed to creating web application with MVC architecture. It's a little complicated for novice, but you should try to grasp it.
