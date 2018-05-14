@@ -1,0 +1,287 @@
+# Learn Blockchains by Building One
+
+*The fastest way to learn how Blockchains work is to build one*
+
+##1. Introduction
+
+You’re here because, you’re psyched about the rise of Cryptocurrencies. And you want to know how Blockchains work—the fundamental technology behind them. But understanding Blockchains isn’t easy—or at least isn’t for a beginner. Long time ago, We trudged through dense videos, followed porous tutorials, and dealt with the amplified frustration of too few examples.
+
+We like learning by doing. It forces you to deal with the subject matter at a code level, which gets it sticking. If you do the same, at the end of this guide you’ll have a functioning Blockchain with a solid grasp of how they work.
+
+##2. Content
+
+### *Preparation: Before you get started…*
+
+Remember that a blockchain is an *immutable, sequential* chain of records called Blocks. They can contain transactions, files or any data you like, really. But the important thing is that they’re *chained* together using *hashes*. If you aren’t sure what a hash is, [here’s an explanation](https://learncryptography.com/hash-functions/what-are-hash-functions).
+
+**Who is this guide aimed at?**
+You should be comfy reading and writing some basic Python, as well as have some understanding of how HTTP requests work, since we’ll be talking to our Blockchain over HTTP.
+
+**What do you need to begin?**
+
+Make sure that [Python 3.5+](https://www.python.org/downloads/) (along with `pip`) is installed. You’ll also need to install [Flask](http://flask.pocoo.org/) and the wonderful [Requests](http://www.python-requests.org/en/master/) library:
+
+```
+ pip3 install Flask==0.12.2 requests==2.18.4 
+```
+
+Oh, you’ll also need an HTTP Client, like [Postman](https://www.getpostman.com) or cURL. But anything will do.
+
+### Building a Blockchain
+
+Open up your favourite text editor or IDE, personally I love [PyCharm](https://www.jetbrains.com/pycharm/). Create a new file, called `blockchain.py`. We’ll only use a single file, but if you get lost, you can always refer to the [source code](https://github.com/dvf/blockchain).
+
+#### Representing a Blockchain
+
+We’ll create a `Blockchain` class whose constructor creates an initial empty list (to store our blockchain), and another to store transactions. Here’s the blueprint for our class:
+
+```
+class Blockchain(object):
+    def __init__(self):
+    	# chain is used for the blockchain
+        self.chain = []
+        # currenr_transactions is used for transactions
+        self.current_transactions = []
+        
+    def new_block(self):
+        # Creates a new Block and adds it to the chain
+        pass
+    
+    def new_transaction(self):
+        # Adds a new transaction to the list of transactions
+        pass
+    
+    @staticmethod
+    def hash(block):
+        # Hashes a Block
+        pass
+
+    @property
+    def last_block(self):
+        # Returns the last Block in the chain
+        pass
+```
+
+Our `Blockchain` class is responsible for managing the chain. It will store transactions and have some  helper methods for adding new blocks to the chain. Let’s start fleshing out some methods.
+
+#### What does a Block look like?
+
+Each block has an *index*, a *timestamp* (in Unix time), a *list of transactions*, a *proof* (more on that later), and the *hash of the previous block*. Here’s an example of what a single Block looks like:
+
+```
+block = {
+    'index': 1,
+    'timestamp': 1506057125.900785,
+    'transactions': [
+        {
+            'sender': "8527147fe1f5426f9dd545de4b27ee00",
+            'recipient': "a77f5cdfa2934df3954a5c7c7da5df1f",
+            'amount': 5,
+        }
+    ],
+    'proof': 324984774000,
+    'previous_hash': "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+}
+```
+
+At this point, the idea of a *chain* should be apparent—each new block contains within itself, the hash of the previous Block. **This is crucial because it’s what gives blockchains immutability:** If an attacker corrupted an earlier Block in the chain then all subsequent blocks will contain incorrect hashes.
+
+*Does this make sense? If it doesn’t, take some time to let it sink in—it’s the core idea behind blockchains.*
+
+#### Adding Transactions to a Block
+
+We’ll need a way of adding transactions to a Block. Our `new_transaction()` method is responsible for this, and it’s pretty straight-forward:
+
+```
+class Blockchain(object):
+    ...
+    
+    def new_transaction(self, sender, recipient, amount):
+        """
+        Creates a new transaction to go into the next mined Block
+        :param sender: <str> Address of the Sender
+        :param recipient: <str> Address of the Recipient
+        :param amount: <int> Amount
+        :return: <int> The index of the Block that will hold this transaction
+        """
+
+        self.current_transactions.append({
+            'sender': sender,
+            'recipient': recipient,
+            'amount': amount,
+        })
+        return self.last_block['index'] + 1
+```
+
+After `new_transaction()` adds a transaction to the list, it returns the *index* of the block which the transaction will be added to—*the next one to be mined.* This will be useful later on, to the user submitting the transaction.
+
+#### Creating new Blocks
+
+When our `Blockchain` is instantiated we’ll need to seed it with a *genesis* block—a block with no predecessors. We’ll also need to add a *“proof”* to our genesis block which is the result of mining (or proof of work). We’ll talk more about mining later. In addition to creating the *genesis* block in our constructor, we’ll also flesh out the methods for `new_block()`, `new_transaction()` and `hash()` :
+
+```
+import hashlib
+import json
+from time import time
+
+
+class Blockchain(object):
+    def __init__(self):
+        self.current_transactions = []
+        self.chain = []
+
+        # Create the genesis block
+        self.new_block(previous_hash=1, proof=100)
+
+    def new_block(self, proof, previous_hash=None):
+        """
+        Create a new Block in the Blockchain
+        :param proof: <int> The proof given by the Proof of Work algorithm
+        :param previous_hash: (Optional) <str> Hash of previous Block
+        :return: <dict> New Block
+        """
+
+        block = {
+            'index': len(self.chain) + 1,
+            'timestamp': time(),
+            'transactions': self.current_transactions,
+            'proof': proof,
+            'previous_hash': previous_hash or self.hash(self.chain[-1]),
+        }
+
+        # Reset the current list of transactions
+        self.current_transactions = []
+
+        self.chain.append(block)
+        return block
+
+    def new_transaction(self, sender, recipient, amount):
+        """
+        Creates a new transaction to go into the next mined Block
+        :param sender: <str> Address of the Sender
+        :param recipient: <str> Address of the Recipient
+        :param amount: <int> Amount
+        :return: <int> The index of the Block that will hold this transaction
+        """
+        self.current_transactions.append({
+            'sender': sender,
+            'recipient': recipient,
+            'amount': amount,
+        })
+
+        return self.last_block['index'] + 1
+
+    @property
+    def last_block(self):
+        return self.chain[-1]
+
+    @staticmethod
+    def hash(block):
+        """
+        Creates a SHA-256 hash of a Block
+        :param block: <dict> Block
+        :return: <str>
+        """
+
+        # We must make sure that the Dictionary is Ordered, or we'll have inconsistent hashes
+        block_string = json.dumps(block, sort_keys=True).encode()
+        return hashlib.sha256(block_string).hexdigest()
+```
+
+The above should be straight-forward—We’ve added some comments and *docstrings* to help keep it clear. We’re almost done with representing our blockchain. But at this point, you must be wondering how new blocks are created, forged or mined.
+
+#### Understanding Proof of Work
+
+A Proof of Work algorithm (PoW) is how new Blocks are created or *mined* on the blockchain*.* The goal of PoW is to discover a number which solves a problem. The number must be **difficult to find** **but easy to verify**—computationally speaking—by anyone on the network. This is the core idea behind Proof of Work.
+
+We’ll look at a very simple example to help this sink in. 
+
+Let’s decide that the *hash* of some integer `x` multiplied by another `y` must end in `0`. So, `hash(x * y) = ac23dc...0`. And for this simplified example, let’s fix `x = 5`. Implementing this in Python:
+
+```
+from hashlib import sha256
+
+x = 5
+y = 0  # We don't know what y should be yet...
+
+while sha256(str(x*y).encode()).hexdigest()[-1] != "0":
+    y += 1
+
+print('The solution is y =',y)
+```
+
+The solution here is `y = 21`. Since, the produced hash ends in `0`:
+
+```
+hash(5 * 21) = 1253e9373e...5e3600155e860
+```
+
+In Bitcoin, the Proof of Work algorithm is called [*Hashcash*](https://en.wikipedia.org/wiki/Hashcash). And it’s not too different from our basic example above. It’s the algorithm that miners race to solve in order to create a new block. In general, the difficulty is determined by the number of characters searched for in a string. The miners are then rewarded for their 
+solution by receiving a coin—in a transaction. The network is able to *easily* verify their solution.
+
+#### Implementing basic Proof of Work
+
+Let’s implement a similar algorithm for our blockchain. Our rule will be similar to the example above:
+
+> *Find a number* **p** *that when hashed with the previous block’s solution a hash with 4 leading* `0`*s is produced.*
+
+```
+import hashlib
+import json
+
+from time import time
+from uuid import uuid4
+
+class Blockchain(object):
+    ...
+        
+    def proof_of_work(self, last_proof):
+        """
+        Simple Proof of Work Algorithm:
+         - Find a number p' such that hash(pp') contains leading 4 zeroes,
+         where p is the previous p'
+         - p is the previous proof, and p' is the new proof
+        :param last_proof: <int>
+        :return: <int>
+        """
+
+        proof = 0
+        while self.valid_proof(last_proof, proof) is False:
+            proof += 1
+
+        return proof
+
+    @staticmethod
+    def valid_proof(last_proof, proof):
+        """
+        Validates the Proof: Does hash(last_proof, proof) contain 4 leading zeroes?
+        :param last_proof: <int> Previous Proof
+        :param proof: <int> Current Proof
+        :return: <bool> True if correct, False if not.
+        """
+
+        guess = (str(last_proof)+str(proof)).encode()
+        guess_hash = hashlib.sha256(guess).hexdigest()
+        return guess_hash[:4] == "0000" 
+```
+
+To adjust the difficulty of the algorithm, we could modify the number of leading zeroes. But 4 is sufficient. You’ll find out that the addition of a single leading zero makes a mammoth difference to the time required to find a solution.
+
+You can create a object to test your blockchain works, like this:
+
+```
+...
+
+if __name__ == '__main__':
+    block = Blockchain()
+    s = block.hash("abc123")
+    print(s)
+```
+
+![](1.png)
+
+
+
+##3. Summary
+
+Our class is almost complete and we’re ready to begin interacting with it using HTTP requests.
